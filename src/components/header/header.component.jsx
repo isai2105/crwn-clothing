@@ -7,6 +7,8 @@ import './header.styles.scss';
 import {ReactComponent as Logo} from '../../assets/crown.svg';
 import { auth } from "../../firebase/firebase.utils";
 
+import { connect } from "react-redux";
+
 
 const Header = ({ currentUser }) => (
     <div className='header'>
@@ -30,4 +32,12 @@ const Header = ({ currentUser }) => (
     </div>
 )
 
-export default Header;
+// every time the store is updated, this function is called
+// the result of this method is merged with the proeprties of the Header component (that is why 'currentUser' has the same name as the Header property)
+const mapsStateToProps = state => ({
+    currentUser: state.user.currentUser
+});
+
+// the first argument is the function that allows us to access the state (store in Redux)
+// it returns a new connected component class that wraps the component we pass in
+export default connect(mapsStateToProps)(Header);

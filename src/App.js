@@ -10,6 +10,9 @@ import Header from './components/header/header.component';
 
 import { auth, createUserProfileDocument } from './firebase/firebase.utils';
 
+import { setCurrentUser } from './redux/user/user.actions';
+import { connect } from 'react-redux';
+
 
 const TestPage = () => (
   <div>
@@ -32,18 +35,26 @@ class App extends React.Component {
       if (userAuth) {
         const userRef = await createUserProfileDocument(userAuth);
         userRef.onSnapshot(snapshot => {
-          this.setState({
-            currentUser: {
-              id: snapshot.id,
-              ...snapshot.data()
-            }
-          }, () => {
-            console.log(this.state);
-          })
+
+          this.props.setCurrentUser({
+            id: snapshot.id,
+            ...snapshot.data()
+          });
+
+          // OLD VERSION before redux:
+          // this.setState({
+          //   currentUser: {
+          //     id: snapshot.id,
+          //     ...snapshot.data()
+          //   }
+          // }, () => {
+          //   console.log(this.state);
+          // })
           console.log(snapshot.data());
         });
       } else { 
-        this.setState( {currentUser: null} );
+        // OLD VERSION before redux:
+        // this.setState( {currentUser: null} );
       }
     });
   }
@@ -56,7 +67,7 @@ class App extends React.Component {
     return (
       <div>
         {/** The Header always must be visible, regardless of the page we are in */}
-        <Header currentUser={this.state.currentUser} />
+        <Header />
         {/* switch allows us to only render 1 ROute match. To avoid rendering multiple components */}
         <Switch>
           {/* without the exact, when visiting: "/" ... both components would render */}
@@ -71,4 +82,11 @@ class App extends React.Component {
 
 }
 
-export default App;
+// the "user" action, gets dispatched to all reducers
+// the reducers use the "type" to figure out if they need to act or not
+const mapDispatchToProps = dispatch => ({
+  setCurrentUser: user => dispatch(setCurrentUser(user))
+});
+
+// passing null because we do not need state to props here
+export default connect(null, mapDispatchToProps)(App);
