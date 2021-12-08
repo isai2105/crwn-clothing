@@ -1,4 +1,4 @@
-import { Switch, Route } from 'react-router-dom';
+import { Switch, Route, Redirect } from 'react-router-dom';
 import React from 'react';
 
 import './App.css';
@@ -73,7 +73,19 @@ class App extends React.Component {
           {/* without the exact, when visiting: "/" ... both components would render */}
           <Route exact={true} path='/' component={HomePage}/>
           <Route exact={true} path='/shop' component={ShopPage}/>
-          <Route exact={true} path='/signIn' component={SignInAndSignUpPage}/>
+          {/**
+           * Notice how instead of: component={SignInAndSignUpPage}
+           * we use render with a conditional .. so it is only rendered if there is a value for the currentUser
+           */}
+          <Route exact={true} path='/signIn' 
+            render={() => 
+              this.props.currentUser ? (
+                <Redirect to='/'/>
+              ) : (
+                <SignInAndSignUpPage/>
+              )
+            }
+          />
           <Route exact={true} path='/test' component={TestPage}/>
         </Switch>
       </div>
@@ -82,6 +94,10 @@ class App extends React.Component {
 
 }
 
+const mapStateToProps = ({user}) => ({
+  currentUser: user.currentUser
+});
+
 // the "user" action, gets dispatched to all reducers
 // the reducers use the "type" to figure out if they need to act or not
 const mapDispatchToProps = dispatch => ({
@@ -89,4 +105,4 @@ const mapDispatchToProps = dispatch => ({
 });
 
 // passing null because we do not need state to props here
-export default connect(null, mapDispatchToProps)(App);
+export default connect(mapStateToProps, mapDispatchToProps)(App);
