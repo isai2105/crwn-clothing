@@ -10,6 +10,10 @@ import CartIcon from "../cart-icon/cart-icon.component";
 import CartDropdown from "../cart-dropdown/cart-dropdown.component";
 
 import { connect } from "react-redux";
+import { createStructuredSelector } from "reselect";
+
+import { selectCurrentUser } from "../../redux/user/user.selectors";
+import { selectCartHidden } from "../../redux/cart/cart.selectors";
 
 
 const Header = ({ currentUser, hidden }) => (
@@ -50,11 +54,20 @@ const mapsStateToProps = state => ({
     currentUser: state.user.currentUser
 });*/
 
-const mapsStateToProps = ({user: { currentUser }, cart: { hidden }}) => ({
-    currentUser,
-    hidden
+
+const mapStateToProps = createStructuredSelector({
+    currentUser: selectCurrentUser,
+    hidden: selectCartHidden
 })
+
+// The code above is the same as:
+/*
+const mapStateToProps = (state) => ({
+    currentUser: selectCurrentUser(state),
+    hidden: selectCartHidden(state)
+});
+*/
 
 // the first argument is the function that allows us to access the state (store in Redux)
 // it returns a new connected component class that wraps the component we pass in
-export default connect(mapsStateToProps)(Header);
+export default connect(mapStateToProps)(Header);
